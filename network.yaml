@@ -1,0 +1,42 @@
+name: "test"
+channels:
+
+organizations:
+  - name: org1
+    peers:
+      - peer0.org1.example.com
+    cas:
+      - ca0.org1.example.com
+      - ca1.org1.example.com
+    mspId: org1
+  - name: org2
+    peers:
+      - peer0.org2.example.com
+    mspId: org2
+peers:
+  - name: peer0.org1.example.com
+    url: https://localhost:7050
+
+cas:
+  - url: https://localhost:7054
+    name: tls-ca
+    tls: true
+    tlsCert:
+      -----BEGIN CERTIFICATE-----
+      MIICFzCCAb2gAwIBAgIUWAeg2OXuxZLRKlnLSYmoe9hQkq8wCgYIKoZIzj0EAwIw
+      aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
+      EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
+      Y2Etc2VydmVyMB4XDTIzMDExNDEwMTgwMFoXDTM4MDExMDEwMTgwMFowaDELMAkG
+      A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
+      cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
+      dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqSN/grkb0tayYbjElRaXq+/p
+      78Zg+cJiIK6Ph5TGjltil3LaW7mHrqnCSJ9hi59/kMxtJsP43FTllaWgZLe/l6NF
+      MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
+      FBEe/9T8IGgdHHQfCgRjpsrBdS1XMAoGCCqGSM49BAMCA0gAMEUCIQDFazw8NJyr
+      Z9ho6mr2AzRsiPNN9lPrPieXqN6rFLk8wwIgMT5FlVT6cg7hoAFTJKDNtTZ4sKw6
+      NKT3hG5IAVAeO1M=
+      -----END CERTIFICATE-----
+
+  - url: https://localhost:7052
+    name: ca1.org1.example.com
+    tls: false

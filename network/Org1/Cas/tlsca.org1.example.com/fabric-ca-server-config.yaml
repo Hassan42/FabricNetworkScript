@@ -1,0 +1,151 @@
+version: v1.5.6-beta3
+port: 8055
+cors:
+  enabled: false
+  origins:
+    - '*'
+debug: false
+crlsizelimit: 512000
+tls:
+  enabled: true
+  certfile: null
+  keyfile: null
+  clientauth:
+    type: noclientcert
+    certfiles: null
+ca:
+  name: tls-ca
+  keyfile: null
+  certfile: null
+  chainfile: null
+  reenrollIgnoreCertExpiry: false
+crl:
+  expiry: 24h
+registry:
+  maxenrollments: -1
+  identities:
+    - name: tlsadmin
+      pass: tlsadminpw
+      type: client
+      affiliation: ''
+      attrs:
+        hf.Registrar.Roles: '*'
+        hf.Registrar.DelegateRoles: '*'
+        hf.Revoker: true
+        hf.IntermediateCA: true
+        hf.GenCRL: true
+        hf.Registrar.Attributes: '*'
+        hf.AffiliationMgr: true
+db:
+  type: sqlite3
+  datasource: fabric-ca-server.db
+  tls:
+    enabled: false
+    certfiles: null
+    client:
+      certfile: null
+      keyfile: null
+ldap:
+  enabled: false
+  url: ldap://<adminDN>:<adminPassword>@<host>:<port>/<base>
+  tls:
+    certfiles: null
+    client:
+      certfile: null
+      keyfile: null
+  attribute:
+    names:
+      - uid
+      - member
+    converters:
+      - name: null
+        value: null
+    maps:
+      groups:
+        - name: null
+          value: null
+affiliations:
+  org1:
+    - department1
+    - department2
+  org2:
+    - department1
+signing:
+  default:
+    usage:
+      - digital signature
+    expiry: 8760h
+  profiles:
+    tls:
+      usage:
+        - signing
+        - key encipherment
+        - server auth
+        - client auth
+        - key agreement
+      expiry: 8760h
+csr:
+  cn: fabric-ca-server
+  keyrequest:
+    algo: ecdsa
+    size: 256
+  names:
+    - C: US
+      ST: North Carolina
+      L: null
+      O: Hyperledger
+      OU: Fabric
+  hosts:
+    - macbook-pro-2.home
+    - localhost
+  ca:
+    expiry: 131400h
+    pathlength: 1
+idemix:
+  rhpoolsize: 1000
+  nonceexpiration: 15s
+  noncesweepinterval: 15m
+  curve: amcl.Fp256bn
+bccsp:
+  default: SW
+  sw:
+    hash: SHA2
+    security: 256
+    filekeystore:
+      keystore: msp/keystore
+cacount: null
+cafiles: null
+intermediate:
+  parentserver:
+    url: null
+    caname: null
+  enrollment:
+    hosts: null
+    profile: null
+    label: null
+  tls:
+    certfiles: null
+    client:
+      certfile: null
+      keyfile: null
+cfg:
+  identities:
+    passwordattempts: 10
+operations:
+  listenAddress: 127.0.0.1:9443
+  tls:
+    enabled: false
+    cert:
+      file: null
+    key:
+      file: null
+    clientAuthRequired: false
+    clientRootCAs:
+      files: []
+metrics:
+  provider: disabled
+  statsd:
+    network: udp
+    address: 127.0.0.1:8125
+    writeInterval: 10s
+    prefix: server

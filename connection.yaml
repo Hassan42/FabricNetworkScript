@@ -1,0 +1,63 @@
+name: "Network"
+version: "0.1"
+
+channels:
+  mychannel:
+    orderers:
+      - orderer.example.com
+    peers:
+      - peer0.org1.example.com
+      - peer0.org2.example.com
+
+organizations:
+  Org1:
+    mspid: Org1MSP
+    peers:
+      - peer0.org1.example.com
+    certificateAuthorities:
+      - ca.org1.example.com
+      - tlsca.org1.example.com
+
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.example.com
+
+orderers:
+  orderer.example.com:
+    url: grpcs://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer.example.com
+    tlsCACerts:
+      path: test/ordererOrganizations/example.com/orderers/orderer.example.com/tlscacerts/example.com-cert.pem
+
+peers:
+  peer0.org1.example.com:
+    url: grpcs://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.example.com
+    tlsCACerts:
+      path: test/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tlscacerts/org1.example.com-cert.pem
+
+  peer0.org2.example.com:
+    url: grpcs://localhost:8051
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.example.com
+    tlsCACerts:
+      path: test/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tlscacerts/org2.example.com-cert.pem
+
+certificateAuthorities:
+  tlsca.org1.example.com:
+    url: https://localhost:8055
+    caName: tls-ca
+    tlsCa: true
+    tlsCACerts: 
+    httpOptions: 
+      verify: true
+  ca.org1.example.com:
+    url: https://localhost:8054
+    caName: ca
+    tlsCa: false
+    tlsCACerts: 
+    httpOptions: 
+      verify: true
