@@ -45,9 +45,11 @@ function buildNetwork(networkConf: any){
 
     utils.createDirectory(orginizationPath);
 
-    const orginizationMspPath = path.resolve("network", organizationKey, "Msp");
+    const orginizationMspPath = path.resolve("network", organizationKey, "msp");
 
     utils.createDirectory(orginizationMspPath);
+
+    fs.copyFileSync(binaryDirectory + "/config/config.yaml", orginizationMspPath + "/config.yaml");
 
     const orginizationUserPath = path.resolve("network", organizationKey, "User");
 
@@ -92,7 +94,7 @@ function buildNetwork(networkConf: any){
     utils.createDirectory(tlsAdminRootCertPath);
     // utils.createDirectory(tlsAdminCertPath);
 
-    const caAdminTlsCertPath = path.resolve("network", organizationKey, "User", "caAdmin/tls-msp");
+    const caAdminTlsCertPath = path.resolve("network", organizationKey, "User", "caAdmin/tls");
     utils.createDirectory(caAdminTlsCertPath);
 
     const fabricCaClientPath = path.resolve("network", organizationKey, "fabric-ca-client");
@@ -117,9 +119,13 @@ const tlsCaAdminId = "tlsadmin";
 const tlsCaAdminPass = "tlsadminpw";
 const walletPath = path.resolve("wallet");  
 
-async function main() {
+function main() {
+
+  try{
 
   dotenv.config()
+
+  fs.rmSync("/Users/hassanatwi/fabric-network-script/network", { recursive: true, force: true });
 
   const networkConf = readNetworkConf();
 
@@ -131,24 +137,83 @@ async function main() {
 
   const fabricTlsCaServer = bashApi.startCa("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", networkConf);
 
-  fabricTlsCaServer.on("spawn", ()=>{
-    setTimeout(function(){
+  fabricTlsCaServer.then(() => {  
+
       bashApi.registerUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", process.env.CA_ADMIN!, process.env.CA_ADMIN_PW!, "/Users/hassanatwi/fabric-network-script/network/Org1/User/tlsAdmin/msp"
-      , networkConf);
+      , networkConf); 
+
+      bashApi.enrollUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", process.env.CA_ADMIN!, process.env.CA_ADMIN_PW!,
+      "/Users/hassanatwi/fabric-network-script/network/Org1/User/caAdmin/tls" , true, networkConf);
+
+      bashApi.initCa("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", networkConf);
       
-      bashApi.enrollUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", process.env.CA_ADMIN!, process.env.CA_ADMIN_PW!, "/Users/hassanatwi/fabric-network-script/network/Org1/User/tlsAdmin/tls-root-cert/tls-ca-cert.pem"
-      , "/Users/hassanatwi/fabric-network-script/network/Org1/User/caAdmin/tls-msp" , true, networkConf);
-    }, 1000)
+      const fabricCaServer = bashApi.startCa("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", networkConf);
 
-  })
+      bashApi.initPeer("/Users/hassanatwi/fabric-network-script/network/Org1/Peers/peer0.org1.example.com", networkConf);
+
+      bashApi.registerUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", "peer1org1", "peer1org1pw", 
+      "/Users/hassanatwi/fabric-network-script/network/Org1/User/tlsAdmin/msp", networkConf);
+    
+      bashApi.enrollUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", "peer1org1", "peer1org1pw",
+       "/Users/hassanatwi/fabric-network-script/network/Org1/Peers/peer0.org1.example.com/tls" , true, networkConf);
+
+
+      fabricCaServer.then(() => {
+
+        bashApi.registerUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", "peer1org1", "peer1org1pw", 
+        "/Users/hassanatwi/fabric-network-script/network/Org1/User/caAdmin/msp", networkConf);
+      
+        bashApi.enrollUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", "peer1org1", "peer1org1pw",
+         "/Users/hassanatwi/fabric-network-script/network/Org1/Peers/peer0.org1.example.com/msp" , false, networkConf);
   
-  bashApi.initCa("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", networkConf);
+        bashApi.startPeer("/Users/hassanatwi/fabric-network-script/network/Org1/Peers/peer0.org1.example.com", networkConf);
 
-  const fabricCaServer = bashApi.startCa("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", networkConf);
+        
 
-  bashApi.initPeer("/Users/hassanatwi/fabric-network-script/network/Org1/Peers/peer0.org1.example.com", networkConf)
 
-  // Setting Up Peers
+
+      })
+
+    }
+    );
+
+
+
+  // fabricTlsCaServer.on("spawn", ()=>{
+  //   setTimeout(function(){
+      
+      // bashApi.registerUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", process.env.CA_ADMIN!, process.env.CA_ADMIN_PW!, "/Users/hassanatwi/fabric-network-script/network/Org1/User/tlsAdmin/msp"
+      // , networkConf);
+      
+      // bashApi.enrollUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", process.env.CA_ADMIN!, process.env.CA_ADMIN_PW!,
+      // "/Users/hassanatwi/fabric-network-script/network/Org1/User/caAdmin/tls" , true, networkConf);
+
+      // bashApi.initCa("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", networkConf);
+
+      // const fabricCaServer = bashApi.startCa("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/ca.org1.example.com", networkConf);
+
+
+      // fabricCaServer.on("spawn", ()=>{
+      //   setTimeout(function(){
+      //     // bashApi.initPeer("/Users/hassanatwi/fabric-network-script/network/Org1/Peers/peer0.org1.example.com", networkConf);
+
+      //     // bashApi.registerUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", "peer1org1", "peer1org1pw", 
+      //     // "/Users/hassanatwi/fabric-network-script/network/Org1/User/tlsAdmin/msp", networkConf);
+        
+      //     // bashApi.enrollUser("/Users/hassanatwi/fabric-network-script/network/Org1/Cas/tlsca.org1.example.com", "peer1org1", "peer1org1pw",
+      //     //  "/Users/hassanatwi/fabric-network-script/network/Org1/Peers/peer0.org1.example.com/tls" , true, networkConf);
+      //   }), 1000
+      // })
+
+    // }, 1000)
+  // })
+  
+ 
+
+
+
+
+
 
 
   
@@ -212,7 +277,10 @@ async function main() {
 
 
   // console.log(tlsCaAdmin)
-  
+  }
+  catch(error){
+    console.log(`error: \n    ${error}`);
+  }
 }
 
 main()
